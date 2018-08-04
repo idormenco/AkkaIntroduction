@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "1.Akka.Net.BasicHelloWorld"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2.Akka.Net.AdvancedExample", "2.Akka.Net.AdvancedExample\2.Akka.Net.AdvancedExample.csproj", "{88529A4D-B442-4BA6-9A60-947C02CAE976}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2.Akka.Net.AdvancedExample.SharedMessages", "2.Akka.Net.AdvancedExample.SharedMessages\2.Akka.Net.AdvancedExample.SharedMessages.csproj", "{1F2ACC73-0815-4CA2-8D29-869A7498354D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{88529A4D-B442-4BA6-9A60-947C02CAE976}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88529A4D-B442-4BA6-9A60-947C02CAE976}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88529A4D-B442-4BA6-9A60-947C02CAE976}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F2ACC73-0815-4CA2-8D29-869A7498354D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F2ACC73-0815-4CA2-8D29-869A7498354D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F2ACC73-0815-4CA2-8D29-869A7498354D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F2ACC73-0815-4CA2-8D29-869A7498354D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
