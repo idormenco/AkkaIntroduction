@@ -30,7 +30,8 @@ namespace Akka.Net.AdvancedExample.Actors
             _printerActorRef = printerActorRef;
 
             Random r = new Random();
-            var nrOfWorkers = r.Next(2, 6);
+            //var nrOfWorkers = r.Next(2, 6);
+            var nrOfWorkers = 2;
             for (int i = 0; i < nrOfWorkers; i++)
             {
                 var randomGender = r.Next(1, 3);

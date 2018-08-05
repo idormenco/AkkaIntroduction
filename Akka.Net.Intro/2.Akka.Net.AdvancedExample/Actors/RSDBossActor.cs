@@ -26,7 +26,8 @@ namespace Akka.Net.AdvancedExample.Actors
             _printerActorRef = printerActorRef;
 
             Random r = new Random();
-            var nrOfLocalityCiefs = r.Next(1, 4);
+            //var nrOfLocalityCiefs = r.Next(1, 4);
+            var nrOfLocalityCiefs = 2;
             for (int i = 0; i < nrOfLocalityCiefs; i++)
             {
                 var g = r.Next(1, 3);

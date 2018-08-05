@@ -1,0 +1,13 @@
+﻿<Window x:Class="Akka.Net.AdvancedExample.Printer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="Auto" Width="Auto">
+    <Grid Name="GridLayout">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="100"/>
+        </Grid.ColumnDefinitions>
+        <DockPanel Name="Panel"></DockPanel>
+        <Button Name="KillButton" Grid.Column="1" Height="100" Click="KillButton_OnClick">Kill</Button>
+    </Grid>
+</Window>

@@ -1,7 +1,9 @@
-﻿
-using System;
+﻿using System;
+using System.Threading;
 using Akka.Actor;
+using Akka.Configuration;
 using Akka.Net.AdvancedExample.Actors;
+using Akka.Net.AdvancedExample.SharedMessages;
 
 namespace Akka.Net.AdvancedExample
 {
@@ -9,18 +11,39 @@ namespace Akka.Net.AdvancedExample
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Creating acotor system");
-            // make an actor system 
-            RsdPartyActorSystem = ActorSystem.Create("RsdPartyActorSystem");
+            Console.WriteLine("try connect tot actor system");
 
-            var printerActorRef = RsdPartyActorSystem.ActorOf(ConsolePrinterActor.Props());
-            IActorRef partyBossActor = RsdPartyActorSystem.ActorOf(RsdBossActor.Props("Bragnea", printerActorRef),
-                "Bragnea");
+            var config = ConfigurationFactory.ParseString(@"
+                akka {
+                    actor {
+                        provider = remote
+                    }
+                    remote {
+                        dot-netty.tcp {
+                            port = 8081
+                            hostname = 0.0.0.0
+                            public-hostname = localhost
+                        }
+                    }
+                }
+            ");
 
-            // blocks the main thread from exiting until the actor system is shut down
-            RsdPartyActorSystem.WhenTerminated.Wait();
+            var rsdPartyActorSystem = ActorSystem.Create("RomaniaSimulationActorSystem", config);
+
+            var printer = rsdPartyActorSystem
+                .ActorSelection("akka.tcp://RomaniaSimulationActorSystem@localhost:8082/user/Printer");
+
+            var printerRef = printer.ResolveOne(TimeSpan.FromSeconds(30)).Result;
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    printer.Tell(new PrintMeMessage("", GenderEnum.Female, 1, "dd"));
+            //    Thread.Sleep(100);
+            //}
+
+            rsdPartyActorSystem
+                .ActorOf(RsdBossActor.Props("Bragnea", printerRef), "Bragnea");
+
+            rsdPartyActorSystem.WhenTerminated.Wait();
         }
-
-        public static ActorSystem RsdPartyActorSystem { get; set; }
     }
 }
