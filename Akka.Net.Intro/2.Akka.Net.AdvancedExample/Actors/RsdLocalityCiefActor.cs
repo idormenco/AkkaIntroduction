@@ -34,9 +34,15 @@ namespace Akka.Net.AdvancedExample.Actors
             var nrOfWorkers = 2;
             for (int i = 0; i < nrOfWorkers; i++)
             {
-                var randomGender = r.Next(1, 3);
-                var worker = RsdSimpleWorkerActor.Props($"W{Guid.NewGuid()}", (GenderEnum)randomGender, printerActorRef);
-                var actorRef = Context.ActorOf(worker, $"W{Guid.NewGuid()}");
+
+                var g = r.Next(1, 3);
+                var randomGender = (GenderEnum)g;
+                var randomName = RomanianNameSurnameUtils.GetName(randomGender);
+                var randomSurname = RomanianNameSurnameUtils.GetSurname();
+
+                var childName = $"{randomSurname}~{randomName}";
+				var workerProps = RsdSimpleWorkerActor.Props(childName, randomGender, printerActorRef);
+                var actorRef = Context.ActorOf(workerProps, childName);
                 _childActorRefs.Add(actorRef);
             }
 
@@ -52,11 +58,11 @@ namespace Akka.Net.AdvancedExample.Actors
             {
                 if (Sender.Equals(Context.Parent))
                 {
-                    var taxAmount = _privateCapital / 3;
+                    var taxAmount = _privateCapital *0.65;
                     if (_privateCapital - taxAmount >= 0)
                     {
-                        Sender.Tell(new TaxIncomeMessage(taxAmount));
-                        _privateCapital -= taxAmount;
+                        Sender.Tell(new TaxIncomeMessage((int)taxAmount));
+                        _privateCapital -= (int)taxAmount;
                         Print();
                     }
                 }

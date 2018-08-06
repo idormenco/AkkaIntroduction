@@ -34,11 +34,11 @@ namespace Akka.Net.AdvancedExample.Actors
             {
                 if (Sender.Equals(Context.Parent))
                 {
-                    var taxAmount = _privateCapital/2;
+                    var taxAmount = _privateCapital*0.75;
                     if (_privateCapital - taxAmount >= 0)
                     {
-                        Sender.Tell(new TaxIncomeMessage(taxAmount));
-                        _privateCapital -= taxAmount;
+                        Sender.Tell(new TaxIncomeMessage((int)taxAmount));
+                        _privateCapital -= (int)taxAmount;
                         Print();
                     }
                 }

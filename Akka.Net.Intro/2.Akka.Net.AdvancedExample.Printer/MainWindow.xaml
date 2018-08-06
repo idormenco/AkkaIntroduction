@@ -7,7 +7,11 @@
             <ColumnDefinition/>
             <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
-        <DockPanel Name="Panel"></DockPanel>
-        <Button Name="KillButton" Grid.Column="1" Height="100" Click="KillButton_OnClick">Kill</Button>
+        <DockPanel Name="Panel" Grid.Column="0" Dock="Top"></DockPanel>
+        <StackPanel Grid.Column="1">
+            <Button Name="KillButton" Click="KillButton_OnClick">Kill</Button>
+            
+
+        </StackPanel>
     </Grid>
 </Window>

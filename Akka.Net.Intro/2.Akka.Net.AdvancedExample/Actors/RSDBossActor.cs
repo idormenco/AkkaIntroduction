@@ -31,10 +31,13 @@ namespace Akka.Net.AdvancedExample.Actors
             for (int i = 0; i < nrOfLocalityCiefs; i++)
             {
                 var g = r.Next(1, 3);
-                Context.ActorOf(RsdCountyCiefActor.Props($"CC{Guid.NewGuid()}",
-                        (GenderEnum)g,
-                        printerActorRef),
-                    $"CC{Guid.NewGuid()}");
+                var randomGender = (GenderEnum)g;
+                var randomName = RomanianNameSurnameUtils.GetName(randomGender);
+                var randomSurname = RomanianNameSurnameUtils.GetSurname();
+
+                var childName = $"{randomSurname}~{randomName}";
+
+                Context.ActorOf(RsdCountyCiefActor.Props(childName,randomGender,printerActorRef),childName);
             }
 
             Receive<TaxIncomeMessage>(x =>
