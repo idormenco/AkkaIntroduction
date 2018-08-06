@@ -35,8 +35,8 @@ namespace Akka.Net.AdvancedExample.Actors
             for (int i = 0; i < nrOfWorkers; i++)
             {
                 var randomGender = r.Next(1, 3);
-                var worker = RsdSimpleWorkerActor.Props($"W{i}", (GenderEnum)randomGender, printerActorRef);
-                var actorRef = Context.ActorOf(worker, $"W{i}");
+                var worker = RsdSimpleWorkerActor.Props($"W{Guid.NewGuid()}", (GenderEnum)randomGender, printerActorRef);
+                var actorRef = Context.ActorOf(worker, $"W{Guid.NewGuid()}");
                 _childActorRefs.Add(actorRef);
             }
 

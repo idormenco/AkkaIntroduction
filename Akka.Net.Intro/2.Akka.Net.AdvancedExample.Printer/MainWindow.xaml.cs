@@ -42,10 +42,10 @@ namespace Akka.Net.AdvancedExample.Printer
             viewer.BindToPanel(Panel);
             Graph graph = new Graph
             {
-                Attr =
-                {
-                    LayerDirection = LayerDirection.TB
-                }
+                //Attr =
+                //{
+                //    LayerDirection = LayerDirection.TB
+                //}
             };
 
             viewer.Graph = graph;

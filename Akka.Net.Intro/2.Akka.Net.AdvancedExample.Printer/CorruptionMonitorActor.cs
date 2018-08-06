@@ -11,60 +11,56 @@ namespace Akka.Net.AdvancedExample.Printer
         private readonly GraphViewer _viewer;
         private readonly Dictionary<string, IActorRef> _knownActors = new Dictionary<string, IActorRef>();
         private readonly HashSet<string> _knownEdges = new HashSet<string>();
-        private readonly Graph graph = new Graph();
+        private readonly Graph _graph;
 
         public CorruptionMonitorActor(GraphViewer viewer)
         {
             _viewer = viewer;
+            _graph = viewer.Graph;
 
+            ReceiveSetup();
+        }
+
+        private void ReceiveSetup()
+        {
             Receive<PrintMeMessage>(x =>
             {
-
                 if (_knownActors.ContainsKey(x.Name))
                 {
-                    graph.FindNode(x.Name);
+                    _graph.FindNode(x.Name);
                 }
                 else
                 {
                     _knownActors.Add(x.Name, Sender);
-
                     var actors = x.Path.Replace("/user/", "").Split('/');
                     if (actors.Length == 1)
                     {
-                        var node = graph.AddNode(x.Name);
+                        //var node = graph.AddNode(x.Name);
                         //node.LabelText = x.Capital.ToString();
                     }
                     else
                     {
                         for (int i = 0; i < actors.Length - 1; i++)
                         {
-
                             var parrent = actors[i];
                             var leaf = actors[i + 1];
                             var edgeId = $"{parrent}{leaf}";
 
                             if (!_knownEdges.Contains(edgeId))
                             {
-                                var newEdge = graph.AddEdge(parrent, leaf);
+                                _knownEdges.Add(edgeId);
+                                var newEdge = _graph.AddEdge(parrent, leaf);
                                 newEdge.Attr.Id = edgeId;
                             }
-
                         }
-
-                        //var node = viewerGraph.AddNode(x.Name);
-                        //node.LabelText = x.Capital.ToString();
                     }
 
-                    _viewer.Graph = graph;
                 }
+                _viewer.Graph = _graph;
 
             });
 
-            Receive<PrintBustedMessage>(x =>
-            {
-
-            });
-
+            Receive<PrintBustedMessage>(x => { });
         }
     }
 }

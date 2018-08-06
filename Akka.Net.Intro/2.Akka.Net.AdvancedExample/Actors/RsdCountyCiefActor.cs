@@ -35,10 +35,10 @@ namespace Akka.Net.AdvancedExample.Actors
             for (int i = 0; i < nrOfLocalityCiefs; i++)
             {
                 var g = r.Next(1, 3);
-                var actorRef = Context.ActorOf(RsdLocalityCiefActor.Props($"LC{i}",
+                var actorRef = Context.ActorOf(RsdLocalityCiefActor.Props($"LC{Guid.NewGuid()}",
                     (GenderEnum)g,
                     printerActorRef),
-                    $"LC{i}");
+                    $"LC{Guid.NewGuid()}");
 
                 _childActorRefs.Add(actorRef);
             }
