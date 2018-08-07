@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Linq;
+using System.Windows;
 using Akka.Actor;
 using Akka.Configuration;
 using Microsoft.Msagl.Drawing;
@@ -63,10 +64,15 @@ namespace Akka.Net.AdvancedExample.Printer
 				if (en.MarkedForDragging && en is IViewerNode)
 				{
 					var viewerNode = en as IViewerNode;
-					var actorRef = viewerNode.Node.UserData as IActorRef;
-					_corruptionMonitorActor.Tell(new CorruptionMonitorActor.CatchThisOneMessage(actorRef));
+					var actorName = viewerNode.Node.Id;
+
+					_corruptionMonitorActor.Tell(new CorruptionMonitorActor.CatchThisOneMessage(actorName));
+					en.MarkedForDragging = false;
+					
 				}
 			}
+
+			_viewer.Entities.First().MarkedForDragging = true;
 		}
 	}
 }

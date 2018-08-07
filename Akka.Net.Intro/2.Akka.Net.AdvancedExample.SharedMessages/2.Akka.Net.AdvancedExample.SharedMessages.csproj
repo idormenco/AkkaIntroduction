@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IAmDeadMessage.cs" />
     <Compile Include="Messages.cs" />
     <Compile Include="GenderEnum.cs" />
     <Compile Include="PrintBustedMessage.cs" />

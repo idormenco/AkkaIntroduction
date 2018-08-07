@@ -13,6 +13,30 @@ namespace Akka.Net.AdvancedExample.Actors
 		private readonly IActorRef _printerActorRef;
 		private readonly HashSet<IActorRef> _childActorRefs = new HashSet<IActorRef>();
 
+		protected override SupervisorStrategy SupervisorStrategy()
+		{
+			return new OneForOneStrategy(
+				maxNrOfRetries: 5,
+				withinTimeRange: TimeSpan.FromMinutes(10),
+				localOnlyDecider: ex =>
+				{
+					switch (ex)
+					{
+						default:
+							return Directive.Stop;
+					}
+				});
+		}
+		public override void AroundPostRestart(Exception cause, object message)
+		{
+			Print();
+		}
+
+		public override void AroundPostStop()
+		{
+			_printerActorRef.Tell(new IAmDeadMessage(_name));
+		}
+
 		private void Print()
 		{
 			var printMeMessage = new PrintMeMessage(_name,
@@ -31,7 +55,7 @@ namespace Akka.Net.AdvancedExample.Actors
 
 			Random r = new Random();
 			//var nrOfLocalityCiefs = r.Next(1, 4);
-			var nrOfLocalityCiefs = 2;
+			var nrOfLocalityCiefs = 1;
 			for (int i = 0; i < nrOfLocalityCiefs; i++)
 			{
 				var g = r.Next(1, 3);
@@ -57,7 +81,7 @@ namespace Akka.Net.AdvancedExample.Actors
 
 			Receive<GothcaMessage>(x =>
 			{
-				printerActorRef.Tell(new PrintBustedMessage(Self.Path.ToStringWithoutAddress()));
+				printerActorRef.Tell(new PrintBustedMessage(_name));
 				throw new GotMeException("Ho my god they cought me");
 			});
 

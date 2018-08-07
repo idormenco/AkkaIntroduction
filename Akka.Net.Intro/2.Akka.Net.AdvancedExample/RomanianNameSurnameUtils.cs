@@ -51,7 +51,7 @@ namespace Akka.Net.AdvancedExample
 			"Rusu",
 			"Ceban",
 			"Ciobanu",
-			"Țurcan",
+			"Turcan",
 			"Cebotari",
 			"Sirbu",
 			"Lungu",

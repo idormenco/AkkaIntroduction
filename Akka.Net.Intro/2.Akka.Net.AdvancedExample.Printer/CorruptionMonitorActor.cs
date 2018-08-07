@@ -33,6 +33,11 @@ namespace Akka.Net.AdvancedExample.Printer
 					var senderNode = _graph.FindNode(x.Name);
 					var displayCapital = x.Capital == 0 ? string.Empty : $"{Environment.NewLine}${x.Capital}";
 
+					if (x.Capital == 0)
+					{
+						int a = 0;
+					}
+					_knownActors[x.Name] = Sender;
 					senderNode.LabelText = $"{x.Name}{displayCapital}";
 				}
 				else
@@ -52,7 +57,7 @@ namespace Akka.Net.AdvancedExample.Printer
 								_knownEdges.Add(edgeId);
 								var parrentNode = _graph.AddNode(parrent);
 								var childNode = _graph.AddNode(leaf);
-
+								
 								var newEdge = _graph.AddEdge(parrentNode.Id, childNode.Id);
 								newEdge.Attr.Id = edgeId;
 								newEdge.Attr.ArrowheadAtTarget = ArrowStyle.None;
@@ -61,28 +66,46 @@ namespace Akka.Net.AdvancedExample.Printer
 
 						var senderNode = _graph.FindNode(actors.Last());
 						senderNode.Attr.FillColor = x.Gender == GenderEnum.Male ? Color.CadetBlue : Color.LightPink;
-						senderNode.UserData = Sender;
 					}
 
 				}
 				_viewer.Graph = _graph;
 
 			});
+
 			Receive<CatchThisOneMessage>(x =>
 			{
-				x.Actor.Tell(GothcaMessage.Instance);
+				_knownActors[x.ActorName].Tell(GothcaMessage.Instance);
 			});
 
-			Receive<PrintBustedMessage>(x => { });
+			Receive<PrintBustedMessage>(x =>
+			{
+				if (_knownActors.ContainsKey(x.Name))
+				{
+					var senderNode = _graph.FindNode(x.Name);
+
+					_knownActors[x.Name] = Sender;
+					senderNode.LabelText = $"{x.Name}{Environment.NewLine}is involved in corruption!!!";
+				}
+
+				_viewer.Graph = _graph;
+			});
+
+			Receive<IAmDeadMessage>(x =>
+			{
+				_knownActors.Remove(x.Name);
+				_graph.RemoveNode(_graph.FindNode(x.Name));
+				_viewer.Graph = _graph;
+			});
 		}
 
 		public class CatchThisOneMessage
 		{
-			public IActorRef Actor { get; }
+			public string ActorName { get; }
 
-			public CatchThisOneMessage(IActorRef actor)
+			public CatchThisOneMessage(string actor)
 			{
-				Actor = actor;
+				ActorName = actor;
 			}
 		}
 	}

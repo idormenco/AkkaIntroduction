@@ -4,77 +4,90 @@ using Akka.Net.AdvancedExample.SharedMessages;
 
 namespace Akka.Net.AdvancedExample.Actors
 {
-    public class RsdSimpleWorkerActor : ReceiveActor
-    {
-        private readonly string _name;
-        private readonly GenderEnum _gender;
-        private int _privateCapital;
-        private readonly IActorRef _printerActorRef;
+	public class RsdSimpleWorkerActor : ReceiveActor
+	{
+		private readonly string _name;
+		private readonly GenderEnum _gender;
+		private int _privateCapital;
+		private readonly IActorRef _printerActorRef;
+		private readonly bool _isStarting = true;
 
-        private class StealMessage
-        {
-            public static StealMessage Instance => new StealMessage();
-        }
+		private class StealMessage
+		{
+			public static StealMessage Instance => new StealMessage();
+		}
+		
 
-        public RsdSimpleWorkerActor(string name, GenderEnum gender, IActorRef printerActorRef)
-        {
-            _name = name;
-            _gender = gender;
-            _printerActorRef = printerActorRef;
+		public override void AroundPostStop()
+		{
+			_printerActorRef.Tell(new IAmDeadMessage(_name));
+		}
 
-            var rnd = new Random();
-            Receive<StealMessage>(x =>
-            {
-                int stealedCapital = rnd.Next(10, 50);
-                _privateCapital += stealedCapital;
-                Print();
-            });
+		public RsdSimpleWorkerActor(string name, GenderEnum gender, IActorRef printerActorRef)
+		{
+			_name = name;
+			_gender = gender;
+			_printerActorRef = printerActorRef;
 
-            Receive<GimmyTaxMessage>(x =>
-            {
-                if (Sender.Equals(Context.Parent))
-                {
-                    var taxAmount = _privateCapital*0.75;
-                    if (_privateCapital - taxAmount >= 0)
-                    {
-                        Sender.Tell(new TaxIncomeMessage((int)taxAmount));
-                        _privateCapital -= (int)taxAmount;
-                        Print();
-                    }
-                }
-            });
+			var rnd = new Random();
 
-            Receive<GothcaMessage>(x =>
-            {
-                printerActorRef.Tell(new PrintBustedMessage(Self.Path.ToStringWithoutAddress()));
-                throw new GotMeException("Ho my god they cought me");
-            });
+			Receive<StealMessage>(x =>
+			{
+				int stealedCapital = rnd.Next(10, 50);
+				_privateCapital += stealedCapital;
+				Print();
+			});
 
-            Print();
+			Receive<GimmyTaxMessage>(x =>
+			{
+				if (Sender.Equals(Context.Parent))
+				{
+					var taxAmount = _privateCapital * 0.75;
+					if (_privateCapital - taxAmount >= 0)
+					{
+						Sender.Tell(new TaxIncomeMessage((int)taxAmount));
+						_privateCapital -= (int)taxAmount;
+						Print();
+					}
+				}
+			});
 
-            Context.System.Scheduler
-                .ScheduleTellRepeatedly(TimeSpan.FromSeconds(10),
-                    TimeSpan.FromSeconds(10),
-                    Self,
-                    StealMessage.Instance,
-                    ActorRefs.Nobody);
+			Receive<GothcaMessage>(x =>
+			{
+				printerActorRef.Tell(new PrintBustedMessage(_name));
+				throw new GotMeException("Ho my god they cought me");
+			});
 
-        }
+			if (_isStarting)
+			{
+				Print();
+				_isStarting = false;
+			}
 
-        private void Print()
-        {
-            var printMeMessage = new PrintMeMessage(_name,
-                _gender,
-                _privateCapital,
-                Self.Path.ToStringWithoutAddress());
+			Context.System.Scheduler
+				.ScheduleTellRepeatedly(TimeSpan.FromSeconds(10),
+					TimeSpan.FromSeconds(10),
+					Self,
+					StealMessage.Instance,
+					ActorRefs.Nobody);
 
-            _printerActorRef.Tell(printMeMessage);
-        }
+		}
+
+		private void Print()
+		{
+			var printMeMessage = new PrintMeMessage(_name,
+				_gender,
+
+				_privateCapital,
+				Self.Path.ToStringWithoutAddress());
+
+			_printerActorRef.Tell(printMeMessage);
+		}
 
 
-        public static Props Props(string name, GenderEnum gender, IActorRef printeActorRef)
-        {
-            return Actor.Props.Create(() => new RsdSimpleWorkerActor(name, gender, printeActorRef));
-        }
-    }
+		public static Props Props(string name, GenderEnum gender, IActorRef printeActorRef)
+		{
+			return Actor.Props.Create(() => new RsdSimpleWorkerActor(name, gender, printeActorRef));
+		}
+	}
 }
