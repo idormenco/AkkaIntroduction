@@ -73,6 +73,8 @@ namespace Akka.Net.AdvancedExample.Actors
 				Print();
 			});
 
+			Print();
+
 			Receive<GothcaMessage>(x =>
 			{
 				printerActorRef.Tell(new PrintBustedMessage(_name));

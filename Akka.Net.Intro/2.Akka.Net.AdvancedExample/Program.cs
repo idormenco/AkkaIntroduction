@@ -11,7 +11,7 @@ namespace Akka.Net.AdvancedExample
 		{
 			Console.WriteLine("try connect tot actor system");
 
-			var config = ConfigurationFactory.ParseString(@"
+			var remoteConfig = ConfigurationFactory.ParseString(@"
                 akka {
                     actor {
                         provider = remote
@@ -22,13 +22,28 @@ namespace Akka.Net.AdvancedExample
                             hostname = localhost
                         }
                     }
-                    cluster {
-                        seed-nodes = [""akka.tcp://RomaniaSimulationActorSystem@localhost:8081""]
-                    }
 	             }
             ");
 
-			var rsdPartyActorSystem = ActorSystem.Create("RomaniaSimulationActorSystem", config);
+			var clusterConfig = ConfigurationFactory.ParseString(@"
+            akka {
+                actor {
+                    provider = cluster
+
+				}
+                remote {
+                    dot-netty.tcp {
+                        port = 0
+                        hostname = localhost
+                      }
+                }
+				cluster {
+                        seed-nodes = [""akka.tcp://RomaniaSimulationActorSystem@localhost:8081""]
+                }
+            }
+            ");
+
+			var rsdPartyActorSystem = ActorSystem.Create("RomaniaSimulationActorSystem", remoteConfig);
 
 			var printer = rsdPartyActorSystem
 				.ActorSelection("akka.tcp://RomaniaSimulationActorSystem@localhost:8081/user/Printer");

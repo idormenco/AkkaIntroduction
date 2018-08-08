@@ -29,7 +29,6 @@ namespace Akka.Net.AdvancedExample.Printer
 			{
 				if (_knownActors.ContainsKey(x.Name))
 				{
-					_graph.FindNode(x.Name);
 					var senderNode = _graph.FindNode(x.Name);
 					var displayCapital = x.Capital == 0 ? string.Empty : $"{Environment.NewLine}${x.Capital}";
 					_knownActors[x.Name] = Sender;
@@ -61,6 +60,16 @@ namespace Akka.Net.AdvancedExample.Printer
 
 						var senderNode = _graph.FindNode(actors.Last());
 						senderNode.Attr.FillColor = x.Gender == GenderEnum.Male ? Color.CadetBlue : Color.LightPink;
+					}
+					else
+					{
+						var senderNode = _graph.FindNode(x.Name);
+						if (senderNode == null)
+						{
+							senderNode = _graph.AddNode(x.Name);
+							senderNode.Attr.FillColor = Color.Red;
+
+						}
 					}
 
 				}

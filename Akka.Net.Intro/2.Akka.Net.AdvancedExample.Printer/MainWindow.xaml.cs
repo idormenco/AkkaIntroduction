@@ -31,7 +31,7 @@ namespace Akka.Net.AdvancedExample.Printer
                 }
             }
             ");
-			/*
+
 			var clusterConfig = ConfigurationFactory.ParseString(@"
             akka {
                 actor {
@@ -49,8 +49,8 @@ namespace Akka.Net.AdvancedExample.Printer
                 }
             }
             ");
-			*/
-			actorSystem = ActorSystem.Create("RomaniaSimulationActorSystem", remoteConfig);
+
+			actorSystem = ActorSystem.Create("RomaniaSimulationActorSystem", clusterConfig);
 
 			InitializeComponent();
 			Loaded += MainWindow_Loaded;
