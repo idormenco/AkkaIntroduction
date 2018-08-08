@@ -10,14 +10,13 @@ namespace Akka.Net.AdvancedExample.Actors
 		private readonly GenderEnum _gender;
 		private int _privateCapital;
 		private readonly IActorRef _printerActorRef;
-		private readonly bool _isStarting = true;
+		private bool _isStarting = true;
 
 		private class StealMessage
 		{
 			public static StealMessage Instance => new StealMessage();
 		}
 		
-
 		public override void AroundPostStop()
 		{
 			_printerActorRef.Tell(new IAmDeadMessage(_name));
@@ -46,6 +45,7 @@ namespace Akka.Net.AdvancedExample.Actors
 					if (_privateCapital - taxAmount >= 0)
 					{
 						Sender.Tell(new TaxIncomeMessage((int)taxAmount));
+						_printerActorRef.Tell(new MoneyFlowMessage(Context.Parent.Path.Name, (int)taxAmount));
 						_privateCapital -= (int)taxAmount;
 						Print();
 					}
@@ -58,10 +58,10 @@ namespace Akka.Net.AdvancedExample.Actors
 				throw new GotMeException("Ho my god they cought me");
 			});
 
-			if (_isStarting)
+			if (!StateHolder.StartedActors.Contains(_name))
 			{
+				StateHolder.StartedActors.TryAdd(_name);
 				Print();
-				_isStarting = false;
 			}
 
 			Context.System.Scheduler

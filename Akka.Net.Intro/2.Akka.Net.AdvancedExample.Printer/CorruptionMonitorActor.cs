@@ -32,11 +32,6 @@ namespace Akka.Net.AdvancedExample.Printer
 					_graph.FindNode(x.Name);
 					var senderNode = _graph.FindNode(x.Name);
 					var displayCapital = x.Capital == 0 ? string.Empty : $"{Environment.NewLine}${x.Capital}";
-
-					if (x.Capital == 0)
-					{
-						int a = 0;
-					}
 					_knownActors[x.Name] = Sender;
 					senderNode.LabelText = $"{x.Name}{displayCapital}";
 				}
@@ -73,6 +68,19 @@ namespace Akka.Net.AdvancedExample.Printer
 
 			});
 
+			Receive<MoneyFlowMessage>(x =>
+			{
+				var senderName = Sender.Path.Name;
+				var edgeId = $"{x.ParrentName}{senderName}";
+				_knownActors[senderName] =  Sender;
+
+				var edge = _graph.EdgeById(edgeId);
+				edge.LabelText = $"${x.Amount}";
+
+				_viewer.Graph = _graph;
+
+			});
+
 			Receive<CatchThisOneMessage>(x =>
 			{
 				_knownActors[x.ActorName].Tell(GothcaMessage.Instance);
@@ -83,7 +91,7 @@ namespace Akka.Net.AdvancedExample.Printer
 				if (_knownActors.ContainsKey(x.Name))
 				{
 					var senderNode = _graph.FindNode(x.Name);
-
+					senderNode.Attr.LineWidth = 1;
 					_knownActors[x.Name] = Sender;
 					senderNode.LabelText = $"{x.Name}{Environment.NewLine}is involved in corruption!!!";
 				}

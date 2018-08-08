@@ -8,10 +8,8 @@
             <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
         <DockPanel Name="Panel" Grid.Column="0" Dock="Top"></DockPanel>
-        <StackPanel Grid.Column="1">
-            <Button Name="KillButton" Click="KillButton_OnClick">Kill</Button>
-            
-
+        <StackPanel Grid.Column="1" Orientation="Vertical">
+            <Button Name="KillButton" Click="KillButton_OnClick"  FontSize="25" Margin="0,50,0,0">Catch</Button>
         </StackPanel>
     </Grid>
 </Window>

@@ -27,10 +27,6 @@ namespace Akka.Net.AdvancedExample.Actors
 					}
 				});
 		}
-		public override void AroundPostRestart(Exception cause, object message)
-		{
-			Print();
-		}
 
 		public override void AroundPostStop()
 		{
@@ -54,8 +50,7 @@ namespace Akka.Net.AdvancedExample.Actors
 			_printerActorRef = printerActorRef;
 
 			Random r = new Random();
-			//var nrOfLocalityCiefs = r.Next(1, 4);
-			var nrOfLocalityCiefs = 1;
+			var nrOfLocalityCiefs = r.Next(1, 4);
 			for (int i = 0; i < nrOfLocalityCiefs; i++)
 			{
 				var g = r.Next(1, 3);
@@ -65,12 +60,13 @@ namespace Akka.Net.AdvancedExample.Actors
 
 				var childName = $"{randomSurname}~{randomName}";
 
-				var actorRef = Context.ActorOf(RsdLocalityCiefActor.Props(childName,
+				var childActorRef = Context.ActorOf(RsdLocalityCiefActor.Props(childName,
 					randomGender,
 					printerActorRef),
 					childName);
 
-				_childActorRefs.Add(actorRef);
+				_childActorRefs.Add(childActorRef);
+				Context.Watch(childActorRef);
 			}
 
 			Receive<TaxIncomeMessage>(x =>
@@ -99,12 +95,23 @@ namespace Akka.Net.AdvancedExample.Actors
 				if (_privateCapital - taxAmount >= 0)
 				{
 					Context.Parent.Tell(new TaxIncomeMessage(taxAmount));
+					_printerActorRef.Tell(new MoneyFlowMessage(Context.Parent.Path.Name, (int)taxAmount));
 					_privateCapital -= taxAmount;
 					Print();
 				}
 			});
 
-			Print();
+			if (!StateHolder.StartedActors.Contains(_name))
+			{
+				StateHolder.StartedActors.TryAdd(_name);
+				Print();
+			}
+
+			Receive<Terminated>(t =>
+			{
+				_childActorRefs.Remove(Sender);
+
+			});
 
 			Context.System.Scheduler
 				.ScheduleTellRepeatedly(TimeSpan.FromSeconds(30),

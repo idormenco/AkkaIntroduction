@@ -18,6 +18,7 @@ namespace Akka.Net.AdvancedExample.Actors
 			return new OneForOneStrategy(
 				maxNrOfRetries: 2,
 				withinTimeRange: TimeSpan.FromMinutes(5),
+				
 				localOnlyDecider: ex =>
 				{
 					switch (ex)
@@ -26,11 +27,6 @@ namespace Akka.Net.AdvancedExample.Actors
 							return Directive.Restart;
 					}
 				});
-		}
-
-		public override void AroundPostRestart(Exception cause, object message)
-		{
-			Print();
 		}
 
 		public override void AroundPostStop()
@@ -55,8 +51,7 @@ namespace Akka.Net.AdvancedExample.Actors
 			_printerActorRef = printerActorRef;
 
 			Random r = new Random();
-			//var nrOfWorkers = r.Next(2, 6);
-			var nrOfWorkers = 1;
+			var nrOfWorkers = r.Next(2, 6);
 			for (int i = 0; i < nrOfWorkers; i++)
 			{
 
@@ -67,11 +62,16 @@ namespace Akka.Net.AdvancedExample.Actors
 
 				var childName = $"{randomSurname}~{randomName}";
 				var workerProps = RsdSimpleWorkerActor.Props(childName, randomGender, printerActorRef);
-				var actorRef = Context.ActorOf(workerProps, childName);
-				_childActorRefs.Add(actorRef);
+				var childActorRef = Context.ActorOf(workerProps, childName);
+				_childActorRefs.Add(childActorRef);
+				Context.Watch(childActorRef);
 			}
 
-			Print();
+			if (!StateHolder.StartedActors.Contains(_name))
+			{
+				StateHolder.StartedActors.TryAdd(_name);
+				Print();
+			}
 
 			Receive<TaxIncomeMessage>(x =>
 			{
@@ -86,13 +86,18 @@ namespace Akka.Net.AdvancedExample.Actors
 					var taxAmount = _privateCapital * 0.65;
 					if (_privateCapital - taxAmount >= 0)
 					{
-						Sender.Tell(new TaxIncomeMessage((int)taxAmount));
+						Sender.Tell(new TaxIncomeMessage((int) taxAmount));
+						_printerActorRef.Tell(new MoneyFlowMessage(Context.Parent.Path.Name, (int)taxAmount));
 						_privateCapital -= (int)taxAmount;
 						Print();
 					}
 				}
 			});
+			Receive<Terminated>(t =>
+			{
+				_childActorRefs.Remove(Sender);
 
+			});
 			Receive<GothcaMessage>(x =>
 			{
 				printerActorRef.Tell(new PrintBustedMessage(_name));

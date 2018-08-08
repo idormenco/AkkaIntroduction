@@ -18,21 +18,39 @@ namespace Akka.Net.AdvancedExample.Printer
 
 		public MainWindow()
 		{
-			var config = ConfigurationFactory.ParseString(@"
+			var remoteConfig = ConfigurationFactory.ParseString(@"
             akka {
                 actor {
-                    provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
-                }
+                    provider = remote
+				}
                 remote {
                     dot-netty.tcp {
-                        port = 8082
+                        port = 8081
                         hostname = localhost
                       }
                 }
             }
             ");
+			/*
+			var clusterConfig = ConfigurationFactory.ParseString(@"
+            akka {
+                actor {
+                    provider = cluster
 
-			actorSystem = ActorSystem.Create("RomaniaSimulationActorSystem", config);
+				}
+                remote {
+                    dot-netty.tcp {
+                        port = 8081
+                        hostname = localhost
+                      }
+                }
+				cluster {
+                        seed-nodes = [""akka.tcp://RomaniaSimulationActorSystem@localhost:8081""]
+                }
+            }
+            ");
+			*/
+			actorSystem = ActorSystem.Create("RomaniaSimulationActorSystem", remoteConfig);
 
 			InitializeComponent();
 			Loaded += MainWindow_Loaded;
