@@ -27,11 +27,6 @@ namespace Akka.Net.AdvancedExample.Actors
 				});
 		}
 
-		public override void AroundPostRestart(Exception cause, object message)
-		{
-			Print();
-		}
-
 		public override void AroundPostStop()
 		{
 			_printerActorRef.Tell(new IAmDeadMessage(_name));
